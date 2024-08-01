@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Casey</title>
+    <link rel="stylesheet" href="../static/style.css">
+</head>
+<body>
+    <!-- A button to open the popup form -->
+    <button class="open-button" onclick="openForm()">Recommended Cases</button>
+
+    <!-- The form -->
+    <div class="form-popup" id="myForm">
+        <form action="/action_page.php" class="form-container">
+            <h1>Casey</h1> 
+
+            <!-- Placeholder elements for spacing -->
+            <div class="form-placeholder"></div>
+
+            <!-- The Close button -->
+            <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+        </form>
+    </div>
+    <script src="../static/script.js"></script>
+</body>
+</html>
