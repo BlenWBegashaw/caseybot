@@ -1,33 +1,36 @@
 import requests
 import json
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 from difflib import SequenceMatcher
-import openai
-import os
 
 app = Flask(__name__)
-
-# Read Salesforce credentials and OpenAI API key from environment variables
-CONSUMER_KEY = os.environ.get('CONSUMER_KEY')
-CONSUMER_SECRET = os.environ.get('CONSUMER_SECRET')
-USERNAME = os.environ.get('USERNAME')
-PASSWORD = os.environ.get('PASSWORD')
-openai.api_key = os.environ.get('OPENAI_API_KEY')
+CORS(app)  # Enable CORS for all routes
 
 # Define constants
 DOMAIN = 'https://ciscomeraki4-dev-ed.develop.my.salesforce.com'
 OAUTH_ENDPOINT = '/services/oauth2/token'
 
+# Define your Salesforce credentials
+CONSUMER_KEY = '3MVG9XgkMlifdwVB7aHSFpsEfvZn554iyhEGunwebN1ImlP5XMEoK7YjGcNU2Lm9ZJUylKNLhgzkoPbuy8BPh'
+CONSUMER_SECRET = 'FBEA32905771C3B4C69E8BA0DE8FD91C5C812AFA63BE46137675736792FE9EA3'
+USERNAME = 'blenw@gmail.com'
+PASSWORD = 'Blen1234567?'
+
 # Function to calculate similarity between two strings
 def calculate_similarity(text1: str, text2: str) -> float:
+    if text1 is None:
+        text1 = ""
+    if text2 is None:
+        text2 = ""
     return SequenceMatcher(None, text1, text2).ratio()
 
 # Function to find the top N matching cases based on subject and description
 def find_top_matches(given_case: dict, cases: list, top_n: int = 5) -> list:
     similarities = []
     for case in cases:
-        subject_similarity = calculate_similarity(given_case["subject"], case["Subject"])
-        description_similarity = calculate_similarity(given_case["description"], case["Description"])
+        subject_similarity = calculate_similarity(given_case.get("subject", ""), case.get("Subject", ""))
+        description_similarity = calculate_similarity(given_case.get("description", ""), case.get("Description", ""))
         overall_similarity = (subject_similarity + description_similarity) / 2
         similarities.append((case, overall_similarity))
 
@@ -71,10 +74,6 @@ def fetch_cases(access_token):
     response.raise_for_status()
     return response.json()['records']
 
-@app.route('/')
-def home():
-    return render_template('file.html')
-
 @app.route('/match_cases', methods=['POST'])
 def match_cases():
     data = request.json
@@ -93,4 +92,4 @@ def match_cases():
 
 if __name__ == '__main__':
     from os import environ
-    app.run(host='0.0.0.0', port=int(environ.get('PORT', 5000)))
+    app.run(host='0.0.0.0', port=int(environ.get('PORT', 5000)), debug=True)
