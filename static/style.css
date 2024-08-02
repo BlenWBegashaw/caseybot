@@ -43,9 +43,9 @@
     font-family: 'Comic Sans MS', cursive, sans-serif; /* Comic Sans font */
   }
   
-  /* Placeholder for the space where the email and password fields were */
+  
   .form-placeholder {
-    height: 180px; /* Adjust this height if necessary to maintain the original spacing */
+    height: 180px; 
     width: 280px;
     margin: 5px 0 22px 0;
   }
@@ -61,7 +61,7 @@
     opacity: 0.8;
   }
   
-  /* Add a red background color to the cancel button */
+  /* Add a blue background color to the cancel button */
   .form-container .cancel {
     border-radius: 100px;
     background-color: #0176D3;
