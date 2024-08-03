@@ -1,28 +1,19 @@
-function openForm() {
-    document.getElementById("myForm").style.display = "block";
-}
-
-function closeForm() {
-    document.getElementById("myForm").style.display = "none";
-}
+document.addEventListener('DOMContentLoaded', (event) => {
+    fetchRecommendations();
+});
 
 function fetchRecommendations() {
-    const subject = document.getElementById("subject").value;
-    const description = document.getElementById("description").value;
-
-    const payload = {
-        case: {
-            subject: subject,
-            description: description
-        }
-    };
-
     fetch('/match_cases', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({
+            case: {
+                subject: 'Automatically fetched subject',
+                description: 'Automatically fetched description'
+            }
+        })
     })
     .then(response => response.json())
     .then(data => {
@@ -48,6 +39,12 @@ function displayRecommendations(recommendations) {
             `;
             list.appendChild(listItem);
         });
+        recommendationsContainer.appendChild(list);
+    } else {
+        recommendationsContainer.innerHTML = '<p>No recommendations found.</p>';
+    }
+}
+
         recommendationsContainer.appendChild(list);
     } else {
         recommendationsContainer.innerHTML = '<p>No recommendations found.</p>';
