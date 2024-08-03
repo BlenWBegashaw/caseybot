@@ -1,11 +1,11 @@
 import requests
 import json
-from flask import Flask, request, jsonify
-from flask_cors import CORS
+from flask import Flask, request, jsonify, render_template
 from difflib import SequenceMatcher
+import openai
+from bs4 import BeautifulSoup
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
 
 # Define constants
 DOMAIN = 'https://ciscomeraki4-dev-ed.develop.my.salesforce.com'
@@ -16,6 +16,9 @@ CONSUMER_KEY = '3MVG9XgkMlifdwVB7aHSFpsEfvZn554iyhEGunwebN1ImlP5XMEoK7YjGcNU2Lm9
 CONSUMER_SECRET = 'FBEA32905771C3B4C69E8BA0DE8FD91C5C812AFA63BE46137675736792FE9EA3'
 USERNAME = 'blenw@gmail.com'
 PASSWORD = 'Blen1234567?'
+
+# Set your OpenAI API key
+openai.api_key = 'sk-proj-CgQcdtaJShKeOwJa7j1sT3BlbkFJjpkjw98nvJqm7HsSia8X'
 
 # Function to calculate similarity between two strings
 def calculate_similarity(text1: str, text2: str) -> float:
@@ -74,6 +77,26 @@ def fetch_cases(access_token):
     response.raise_for_status()
     return response.json()['records']
 
+# Web scraping function
+def scrape_salesforce_cases(url):
+    response = requests.get(url)
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.content, 'html.parser')
+        cases = []
+        for case in soup.find_all('div', class_='case'):  # Adjust the selector based on the actual HTML structure
+            subject = case.find('h2').text
+            description = case.find('p').text
+            cases.append({"subject": subject, "description": description})
+        return cases
+    else:
+        return []
+
+@app.route('/')
+def home():
+    subject = request.args.get('subject', '')
+    description = request.args.get('description', '')
+    return render_template('file.html', subject=subject, description=description)
+
 @app.route('/match_cases', methods=['POST'])
 def match_cases():
     data = request.json
@@ -90,6 +113,21 @@ def match_cases():
 
     return jsonify(top_matches)
 
+@app.route('/scrape_and_match', methods=['POST'])
+def scrape_and_match():
+    data = request.json
+    given_case = data['case']
+    url = data['url']
+
+    # Scrape cases from the provided URL
+    scraped_cases = scrape_salesforce_cases(url)
+
+    # Find top matches
+    top_matches = find_top_matches(given_case, scraped_cases)
+
+    return jsonify(top_matches)
+
 if __name__ == '__main__':
     from os import environ
     app.run(host='0.0.0.0', port=int(environ.get('PORT', 5000)), debug=True)
+
