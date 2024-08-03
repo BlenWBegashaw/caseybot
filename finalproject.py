@@ -96,7 +96,7 @@ def home():
     subject = request.args.get('subject', '')
     description = request.args.get('description', '')
     return render_template('file.html', subject=subject, description=description)
-
+    
 @app.route('/match_cases', methods=['POST'])
 def match_cases():
     data = request.json
