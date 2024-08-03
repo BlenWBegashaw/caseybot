@@ -45,6 +45,7 @@ function displayRecommendations(recommendations) {
     }
 }
 
+
         recommendationsContainer.appendChild(list);
     } else {
         recommendationsContainer.innerHTML = '<p>No recommendations found.</p>';
