@@ -7,37 +7,9 @@
     <link rel="stylesheet" href="static/style.css">
 </head>
 <body>
-    <!-- A button to open the popup form -->
-    <button class="open-button" onclick="openForm()">Recommended Cases</button>
-
-    <!-- The form -->
-    <div class="form-popup" id="myForm">
-        <form id="caseForm" class="form-container">
-            <h1>Casey</h1> 
-
-            <!-- Input fields for subject and description -->
-            <label for="subject"><b>Subject</b></label>
-            <input type="text" id="subject" name="subject" required>
-
-            <label for="description"><b>Description</b></label>
-            <textarea id="description" name="description" required></textarea>
-
-            <!-- Submit button -->
-            <button type="button" class="btn" onclick="fetchRecommendations()">Submit</button>
-
-            <!-- Placeholder elements for spacing -->
-            <div class="form-placeholder"></div>
-
-            <!-- The Close button -->
-            <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
-        </form>
-    </div>
-
     <!-- Section to display recommended cases -->
     <div id="recommendations" class="recommendations-container"></div>
 
     <script src="static/script.js"></script>
 </body>
 </html>
-
-
