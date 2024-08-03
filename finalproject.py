@@ -2,8 +2,8 @@ import requests
 import json
 from flask import Flask, request, jsonify, render_template
 from difflib import SequenceMatcher
-import openai
-from bs4 import BeautifulSoup
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 app = Flask(__name__)
 
@@ -17,16 +17,15 @@ CONSUMER_SECRET = 'FBEA32905771C3B4C69E8BA0DE8FD91C5C812AFA63BE46137675736792FE9
 USERNAME = 'blenw@gmail.com'
 PASSWORD = 'Blen1234567?'
 
-# Set your OpenAI API key
-openai.api_key = 'sk-proj-CgQcdtaJShKeOwJa7j1sT3BlbkFJjpkjw98nvJqm7HsSia8X'
-
-# Function to calculate similarity between two strings
+# Function to calculate similarity between two strings using TF-IDF and cosine similarity
 def calculate_similarity(text1: str, text2: str) -> float:
     if text1 is None:
         text1 = ""
     if text2 is None:
         text2 = ""
-    return SequenceMatcher(None, text1, text2).ratio()
+    vectorizer = TfidfVectorizer().fit_transform([text1, text2])
+    vectors = vectorizer.toarray()
+    return cosine_similarity(vectors)[0, 1]
 
 # Function to find the top N matching cases based on subject and description
 def find_top_matches(given_case: dict, cases: list, top_n: int = 5) -> list:
@@ -77,26 +76,10 @@ def fetch_cases(access_token):
     response.raise_for_status()
     return response.json()['records']
 
-# Web scraping function
-def scrape_salesforce_cases(url):
-    response = requests.get(url)
-    if response.status_code == 200:
-        soup = BeautifulSoup(response.content, 'html.parser')
-        cases = []
-        for case in soup.find_all('div', class_='case'):  # Adjust the selector based on the actual HTML structure
-            subject = case.find('h2').text
-            description = case.find('p').text
-            cases.append({"subject": subject, "description": description})
-        return cases
-    else:
-        return []
-
 @app.route('/')
 def home():
-    subject = request.args.get('subject', '')
-    description = request.args.get('description', '')
-    return render_template('file.html', subject=subject, description=description)
-    
+    return render_template('index.html')
+
 @app.route('/match_cases', methods=['POST'])
 def match_cases():
     data = request.json
@@ -113,21 +96,5 @@ def match_cases():
 
     return jsonify(top_matches)
 
-@app.route('/scrape_and_match', methods=['POST'])
-def scrape_and_match():
-    data = request.json
-    given_case = data['case']
-    url = data['url']
-
-    # Scrape cases from the provided URL
-    scraped_cases = scrape_salesforce_cases(url)
-
-    # Find top matches
-    top_matches = find_top_matches(given_case, scraped_cases)
-
-    return jsonify(top_matches)
-
 if __name__ == '__main__':
-    from os import environ
-    app.run(host='0.0.0.0', port=int(environ.get('PORT', 5000)), debug=True)
-
+    app.run(debug=True)
