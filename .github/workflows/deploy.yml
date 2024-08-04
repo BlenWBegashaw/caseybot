@@ -24,7 +24,7 @@ jobs:
 
       - name: Install Salesforce CLI
         run: |
-          curl https://cdn.jsdelivr.net/gh/forcedotcom/cli-plugins@master/install.sh | bash
+          curl https://developer.salesforce.com/media/salesforce-cli/sfdx-cli/install.sh | bash
           echo "Salesforce CLI installed."
 
       - name: Run deploy script
@@ -35,3 +35,4 @@ jobs:
           CONSUMER_SECRET: 'FBEA32905771C3B4C69E8BA0DE8FD91C5C812AFA63BE46137675736792FE9EA3'
           SALESFORCE_USERNAME: 'blenw@gmail.com'
           SALESFORCE_PASSWORD: 'Blen1234567'
+
