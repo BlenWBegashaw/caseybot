@@ -1,3 +1,18 @@
 <template>
-    <iframe src="https://caseybot-3785eca7c1f1.herokuapp.com" width="100%" height="600px"></iframe>
+    <lightning-card title="Case Recommendations">
+        <template if:true={recommendations.length}>
+            <ul>
+                <template for:each={recommendations} for:item="rec">
+                    <li key={rec.case_number}>
+                        <a href={rec.case_link} target="_blank">{rec.subject}</a>
+                        <p>{rec.description}</p>
+                        <p>Similarity: {rec.similarity}</p>
+                    </li>
+                </template>
+            </ul>
+        </template>
+        <template if:false={recommendations.length}>
+            <p>No recommendations found.</p>
+        </template>
+    </lightning-card>
 </template>
