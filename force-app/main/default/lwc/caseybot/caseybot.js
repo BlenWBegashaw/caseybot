@@ -30,7 +30,7 @@ export default class CaseRecommendationBot extends LightningElement {
             }
         };
 
-        fetch('https://caseybot-3785eca7c1f1.herokuapp.com/', {
+        fetch('https://caseybot-3785eca7c1f1.herokuapp.com', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -41,6 +41,12 @@ export default class CaseRecommendationBot extends LightningElement {
         .then(data => {
             this.recommendations = data;
         })
+        .catch(error => {
+            console.error('Error fetching recommendations:', error);
+        });
+    }
+}
+
         .catch(error => {
             console.error('Error fetching recommendations:', error);
         });
