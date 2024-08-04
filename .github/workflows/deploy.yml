@@ -12,22 +12,30 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
         with:
-          node-version: '20' # Change this to your required Node.js version
+          python-version: '3.9' # Change this to your required Python version
 
-      - name: Install Salesforce CLI
+      - name: Install dependencies
         run: |
-          npm install -g sfdx-cli
-          echo "Salesforce CLI installed."
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-      - name: Run deploy script
+      - name: Run deployment script
         run: |
-          bash deploy.sh
+          curl -sL https://cli-assets.heroku.com/install.sh | sh
+          echo "Heroku CLI installed."
+          heroku auth:token # Authenticate with Heroku
+
+      - name: Push to Heroku
+        run: |
+          git remote add heroku https://git.heroku.com/<your-heroku-app>.git
+          git push heroku main
         env:
           CONSUMER_KEY: '3MVG9XgkMlifdwVB7aHSFpsEfvZn554iyhEGunwebN1ImlP5XMEoK7YjGcNU2Lm9ZJUylKNLhgzkoPbuy8BPh'
           CONSUMER_SECRET: 'FBEA32905771C3B4C69E8BA0DE8FD91C5C812AFA63BE46137675736792FE9EA3'
-          SALESFORCE_USERNAME: 'BlenWBegashaw'
+          SALESFORCE_USERNAME: 'blenw@gmail.com'
           SALESFORCE_PASSWORD: 'Blen1234567'
+
 
