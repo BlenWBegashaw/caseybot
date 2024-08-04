@@ -26,7 +26,8 @@ jobs:
         run: |
           bash deploy.sh
         env:
-          CONSUMER_KEY: ${{ secrets.CONSUMER_KEY }}
-          CONSUMER_SECRET: ${{ secrets.CONSUMER_SECRET }}
-          SALESFORCE_USERNAME: ${{ secrets.USERNAME }}
-          SALESFORCE_PASSWORD: ${{ secrets.PASSWORD }}
+          CONSUMER_KEY: '3MVG9XgkMlifdwVB7aHSFpsEfvZn554iyhEGunwebN1ImlP5XMEoK7YjGcNU2Lm9ZJUylKNLhgzkoPbuy8BPh'         # Direct value
+          CONSUMER_SECRET: 'FBEA32905771C3B4C69E8BA0DE8FD91C5C812AFA63BE46137675736792FE9EA3'   # Direct value
+          SALESFORCE_USERNAME: 'blenw@gmail.com'   # Direct value
+          SALESFORCE_PASSWORD: 'Blen1234567'    # Direct value
+
