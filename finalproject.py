@@ -1,3 +1,4 @@
+import os
 import requests
 import json
 from flask import Flask, request, jsonify, render_template
@@ -11,11 +12,11 @@ app = Flask(__name__)
 DOMAIN = 'https://ciscomeraki4-dev-ed.develop.my.salesforce.com'
 OAUTH_ENDPOINT = '/services/oauth2/token'
 
-# Define your Salesforce credentials
-CONSUMER_KEY = '3MVG9XgkMlifdwVB7aHSFpsEfvZn554iyhEGunwebN1ImlP5XMEoK7YjGcNU2Lm9ZJUylKNLhgzkoPbuy8BPh'
-CONSUMER_SECRET = 'FBEA32905771C3B4C69E8BA0DE8FD91C5C812AFA63BE46137675736792FE9EA3'
-USERNAME = 'blenw@gmail.com'
-PASSWORD = 'Blen1234567?'
+# Define your Salesforce credentials using environment variables
+CONSUMER_KEY = os.getenv('CONSUMER_KEY', 'default_consumer_key')
+CONSUMER_SECRET = os.getenv('CONSUMER_SECRET', 'default_consumer_secret')
+USERNAME = os.getenv('SALESFORCE_USERNAME', 'default_username')
+PASSWORD = os.getenv('SALESFORCE_PASSWORD', 'default_password')
 
 # Function to calculate similarity between two strings using TF-IDF and cosine similarity
 def calculate_similarity(text1: str, text2: str) -> float:
@@ -85,18 +86,22 @@ def match_cases():
     data = request.json
     given_case = data['case']
 
-    # Get access token
-    access_token = get_access_token()
+    try:
+        # Get access token
+        access_token = get_access_token()
 
-    # Fetch cases from Salesforce
-    existing_cases = fetch_cases(access_token)
+        # Fetch cases from Salesforce
+        existing_cases = fetch_cases(access_token)
 
-    # Find top matches
-    top_matches = find_top_matches(given_case, existing_cases)
+        # Find top matches
+        top_matches = find_top_matches(given_case, existing_cases)
 
-    return jsonify(top_matches)
+        return jsonify(top_matches)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
+
 
 
