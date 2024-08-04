@@ -30,7 +30,7 @@ export default class CaseRecommendationBot extends LightningElement {
             }
         };
 
-        fetch('https://your-app-name.herokuapp.com/match_cases', {
+        fetch('https://caseybot-3785eca7c1f1.herokuapp.com/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -46,3 +46,4 @@ export default class CaseRecommendationBot extends LightningElement {
         });
     }
 }
+
