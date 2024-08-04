@@ -1,1 +1,2 @@
-﻿web: gunicorn finalproject:app
+web: gunicorn finalproject:app
+release: ./deploy.sh
