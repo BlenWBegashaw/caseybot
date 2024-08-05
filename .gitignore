@@ -1,2 +1,21 @@
 # created by virtualenv automatically
 *
+# Python
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
+
+# Virtual Environment
+env/
+venv/
+.virtualenv/
+
+# Heroku
+*.sqlite3
+
+# Other
+.env
+*.log
+*.DS_Store
