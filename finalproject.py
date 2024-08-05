@@ -1,18 +1,12 @@
-
 import os
-import time
 import requests
 from flask import Flask, request, jsonify, render_template
-from difflib import SequenceMatcher
+from flask_socketio import SocketIO, emit
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
 
 app = Flask(__name__)
+socketio = SocketIO(app)
 
 # Define constants
 DOMAIN = 'https://ciscomeraki4-dev-ed.develop.my.salesforce.com'
@@ -56,30 +50,6 @@ def find_top_matches(given_case: dict, cases: list, top_n: int = 5) -> list:
             "similarity": similarity
         })
     return top_matches
-
-# Function to log in to Salesforce using Selenium
-def login_to_salesforce(driver, username, password):
-    driver.get('https://login.salesforce.com')
-    time.sleep(3)
-    
-    username_field = driver.find_element(By.ID, 'username')
-    password_field = driver.find_element(By.ID, 'password')
-    login_button = driver.find_element(By.ID, 'Login')
-
-    username_field.send_keys(username)
-    password_field.send_keys(password)
-    login_button.click()
-
-    time.sleep(5)
-
-# Function to scrape data from a specific case URL
-def scrape_case_data(driver, case_url):
-    driver.get(case_url)
-    time.sleep(5)
-
-    subject = driver.find_element(By.CSS_SELECTOR, 'h1').text
-    description = driver.find_element(By.CSS_SELECTOR, 'p').text
-    return subject, description
 
 # Function to get access token
 def get_access_token():
@@ -128,42 +98,18 @@ def match_cases():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route('/scrape_cases', methods=['POST'])
-def scrape_cases():
-    salesforce_username = 'blenw@gmail.com'
-    salesforce_password = 'Blen1234567?'
-    case_urls = request.json.get('case_urls', [])
+@socketio.on('connect')
+def handle_connect():
+    print('Client connected')
 
-    # Set up Chrome options
-    chrome_options = Options()
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-dev-shm-usage")
+@socketio.on('disconnect')
+def handle_disconnect():
+    print('Client disconnected')
 
-    # Initialize the Chrome driver
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
-
-    try:
-        # Log in to Salesforce
-        login_to_salesforce(driver, salesforce_username, salesforce_password)
-
-        results = []
-        for case_url in case_urls:
-            subject, description = scrape_case_data(driver, case_url)
-            results.append({
-                "subject": subject,
-                "description": description,
-                "url": case_url
-            })
-            time.sleep(60)  # Wait between scraping to avoid hitting the server too fast
-
-        return jsonify(results)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-    finally:
-        driver.quit()
+@socketio.on('message')
+def handle_message(data):
+    print('Received message: ' + data)
+    # Process the message and perform any necessary actions
 
 if __name__ == '__main__':
-    app.run(debug=True)
-
-
+    socketio.run(app, debug=True)
