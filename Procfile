@@ -1,2 +1,2 @@
 web: gunicorn finalproject:app
-release: ./deploy.sh
+release: python manage.py db upgrade
