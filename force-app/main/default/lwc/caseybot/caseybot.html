@@ -1,18 +1,41 @@
 <template>
     <lightning-card title="Case Recommendations">
-        <template if:true={recommendations.length}>
-            <ul>
-                <template for:each={recommendations} for:item="rec">
-                    <li key={rec.case_number}>
-                        <a href={rec.case_link} target="_blank">{rec.subject}</a>
-                        <p>{rec.description}</p>
-                        <p>Similarity: {rec.similarity}</p>
-                    </li>
-                </template>
-            </ul>
-        </template>
-        <template if:false={recommendations.length}>
-            <p>No recommendations found.</p>
+        <lightning-button label="Recommend Case" onclick={handleFetchRecommendations}></lightning-button>
+        
+        <template if:true={showModal}>
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={handleCloseModal}>
+                            <lightning-icon icon-name="utility:close" alternative-text="close" size="small"></lightning-icon>
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                        <h2 class="slds-text-heading_medium">Case Recommendations</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium">
+                        <template if:true={recommendations.length}>
+                            <ul>
+                                <template for:each={recommendations} for:item="recommendation">
+                                    <li key={recommendation.case_number}>
+                                        <a href={recommendation.case_link} target="_blank">
+                                            {recommendation.case_number}: {recommendation.subject}
+                                        </a>
+                                        <p>{recommendation.description}</p>
+                                        <p>Similarity: {recommendation.similarity}</p>
+                                    </li>
+                                </template>
+                            </ul>
+                        </template>
+                        <template if:false={recommendations.length}>
+                            <p>No recommendations found.</p>
+                        </template>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning-button label="Close" onclick={handleCloseModal}></lightning-button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
         </template>
     </lightning-card>
 </template>
