@@ -30,6 +30,8 @@ export default class Caseybot extends LightningElement {
             }
         };
 
+        console.log('Payload:', payload); // Log the payload to verify
+
         fetch('https://caseybot-3785eca7c1f1.herokuapp.com/match_cases', {
             method: 'POST',
             headers: {
