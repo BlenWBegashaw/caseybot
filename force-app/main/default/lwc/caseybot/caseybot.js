@@ -149,7 +149,7 @@ export default class Caseybot extends LightningElement {
     handleFetchRecommendations() {
         const currentUrl = window.location.href; // Get the current URL
 
-        fetch('https://your-heroku-app.herokuapp.com/match_cases', {
+        fetch('https://caseybot-3785eca7c1f1.herokuapp.com//match_cases', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
