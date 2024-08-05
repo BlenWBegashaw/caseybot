@@ -136,11 +136,10 @@ app = Flask(__name__)
 CORS(app)
 socketio = SocketIO(app)
 
-# Define constants
-DOMAIN = 'https://ciscomeraki4-dev-ed.develop.lightning.force.com/lightning/r/Case/500aj00000FL9RyAAL/view'
+# Salesforce credentials
+LOGIN_DOMAIN = 'https://login.salesforce.com'
+INSTANCE_URL = 'https://ciscomeraki4-dev-ed.develop.my.salesforce.com'
 OAUTH_ENDPOINT = '/services/oauth2/token'
-
-# Define your Salesforce credentials
 CONSUMER_KEY = '3MVG9XgkMlifdwVB7aHSFpsEfvZn554iyhEGunwebN1ImlP5XMEoK7YjGcNU2Lm9ZJUylKNLhgzkoPbuy8BPh'
 CONSUMER_SECRET = 'FBEA32905771C3B4C69E8BA0DE8FD91C5C812AFA63BE46137675736792FE9EA3'
 USERNAME = 'blenw@gmail.com'
@@ -185,7 +184,7 @@ def find_top_matches_gpt(given_case: dict, cases: list, top_n: int = 5) -> list:
                 if case["CaseNumber"] == case_number:
                     top_matches.append({
                         "case_number": case["CaseNumber"],
-                        "case_link": f"{DOMAIN}/lightning/r/Case/{case['Id']}/view",
+                        "case_link": f"{INSTANCE_URL}/lightning/r/Case/{case['Id']}/view",
                         "subject": case["Subject"],
                         "description": case["Description"],
                         "similarity": relevance_score
@@ -202,7 +201,7 @@ def get_access_token():
         'username': USERNAME,
         'password': PASSWORD
     }
-    response = requests.post(DOMAIN + OAUTH_ENDPOINT, data=payload)
+    response = requests.post(LOGIN_DOMAIN + OAUTH_ENDPOINT, data=payload)
     response.raise_for_status()
     token_response = response.json()
     return token_response['access_token']
@@ -213,12 +212,13 @@ def fetch_cases(access_token):
         'Authorization': f'Bearer {access_token}',
         'Content-Type': 'application/json'
     }
-    response = requests.get(f'{DOMAIN}/services/data/v52.0/query/?q=SELECT+Id,CaseNumber,Subject,Description+FROM+Case', headers=headers)
+    response = requests.get(f'{INSTANCE_URL}/services/data/v52.0/query/?q=SELECT+Id,CaseNumber,Subject,Description+FROM+Case', headers=headers)
     response.raise_for_status()
     return response.json()['records']
 
 # Function to scrape subject and description from the case page
-def scrape_case_details(url):
+def scrape_case_details():
+    url = 'https://ciscomeraki4-dev-ed.develop.lightning.force.com/lightning/r/Case/500aj00000FL9RyAAL/view'
     response = requests.get(url)
     soup = BeautifulSoup(response.content, 'html.parser')
     subject_element = soup.find('lightning-formatted-text', {'title': True})
@@ -242,7 +242,7 @@ def match_cases():
     print('Received case:', given_case)
 
     # Scrape the subject and description from the case page
-    subject, description = scrape_case_details(given_case['url'])
+    subject, description = scrape_case_details()
     given_case['subject'] = subject
     given_case['description'] = description
 
