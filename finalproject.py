@@ -1,3 +1,4 @@
+
 import os
 import time
 import requests
@@ -17,11 +18,11 @@ app = Flask(__name__)
 DOMAIN = 'https://ciscomeraki4-dev-ed.develop.my.salesforce.com'
 OAUTH_ENDPOINT = '/services/oauth2/token'
 
-# Define your Salesforce credentials
-CONSUMER_KEY = os.getenv('CONSUMER_KEY', 'default_consumer_key')
-CONSUMER_SECRET = os.getenv('CONSUMER_SECRET', 'default_consumer_secret')
-USERNAME = os.getenv('SALESFORCE_USERNAME', 'default_username')
-PASSWORD = os.getenv('SALESFORCE_PASSWORD', 'default_password')
+# Hardcoded Salesforce credentials
+CONSUMER_KEY = '3MVG9XgkMlifdwVB7aHSFpsEfvZn554iyhEGunwebN1ImlP5XMEoK7YjGcNU2Lm9ZJUylKNLhgzkoPbuy8BPh'
+CONSUMER_SECRET = 'FBEA32905771C3B4C69E8BA0DE8FD91C5C812AFA63BE46137675736792FE9EA3'
+USERNAME = 'blenw@gmail.com'
+PASSWORD = 'Blen1234567?'
 
 # Function to calculate similarity between two strings
 def calculate_similarity(text1: str, text2: str) -> float:
@@ -57,7 +58,7 @@ def find_top_matches(given_case: dict, cases: list, top_n: int = 5) -> list:
     return top_matches
 
 # Function to log in to Salesforce using Selenium
-def login_to_salesforce(username, password):
+def login_to_salesforce(driver, username, password):
     driver.get('https://login.salesforce.com')
     time.sleep(3)
     
@@ -72,7 +73,7 @@ def login_to_salesforce(username, password):
     time.sleep(5)
 
 # Function to scrape data from a specific case URL
-def scrape_case_data(case_url):
+def scrape_case_data(driver, case_url):
     driver.get(case_url)
     time.sleep(5)
 
@@ -129,8 +130,8 @@ def match_cases():
 
 @app.route('/scrape_cases', methods=['POST'])
 def scrape_cases():
-    salesforce_username = os.getenv('SALESFORCE_USERNAME', 'blenw@gmail.com')
-    salesforce_password = os.getenv('SALESFORCE_PASSWORD', 'Blen1234567?')
+    salesforce_username = 'blenw@gmail.com'
+    salesforce_password = 'Blen1234567?'
     case_urls = request.json.get('case_urls', [])
 
     # Set up Chrome options
@@ -142,24 +143,27 @@ def scrape_cases():
     # Initialize the Chrome driver
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
-    # Log in to Salesforce
-    login_to_salesforce(salesforce_username, salesforce_password)
+    try:
+        # Log in to Salesforce
+        login_to_salesforce(driver, salesforce_username, salesforce_password)
 
-    results = []
-    for case_url in case_urls:
-        subject, description = scrape_case_data(case_url)
-        results.append({
-            "subject": subject,
-            "description": description,
-            "url": case_url
-        })
-        time.sleep(60)  # Wait between scraping to avoid hitting the server too fast
+        results = []
+        for case_url in case_urls:
+            subject, description = scrape_case_data(driver, case_url)
+            results.append({
+                "subject": subject,
+                "description": description,
+                "url": case_url
+            })
+            time.sleep(60)  # Wait between scraping to avoid hitting the server too fast
 
-    driver.quit()
-    return jsonify(results)
+        return jsonify(results)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        driver.quit()
 
 if __name__ == '__main__':
     app.run(debug=True)
-
 
 
