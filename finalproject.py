@@ -221,8 +221,10 @@ def fetch_cases(access_token):
 def scrape_case_details(url):
     response = requests.get(url)
     soup = BeautifulSoup(response.content, 'html.parser')
-    subject = soup.find('div', {'class': 'subject-class'}).text.strip()  # Update the selector as needed
-    description = soup.find('div', {'class': 'description-class'}).text.strip()  # Update the selector as needed
+    subject_element = soup.find('lightning-formatted-text', {'title': True})
+    subject = subject_element['title'].strip() if subject_element else 'No subject found'
+    description_element = soup.find('div', {'class': 'description-class'})  # Update the selector as needed
+    description = description_element.text.strip() if description_element else 'No description found'
     return subject, description
 
 @app.route('/')
