@@ -157,30 +157,41 @@ def calculate_similarity(text1: str, text2: str) -> float:
         text2 = ""
     return SequenceMatcher(None, text1, text2).ratio()
 
-# Function to find the top N matching cases based on subject and description
-def find_top_matches(given_case: dict, cases: list, top_n: int = 5) -> list:
-    similarities = []
+# Function to find the top N matching cases based on subject and description using GPT-3.5
+def find_top_matches_gpt(given_case: dict, cases: list, top_n: int = 5) -> list:
+    prompt = f"Find the most relevant cases for the following case:\n\nSubject: {given_case['subject']}\nDescription: {given_case['description']}\n\nHere are the available cases:\n"
     for case in cases:
-        subject_similarity = calculate_similarity(given_case.get("subject", ""), case.get("Subject", ""))
-        description_similarity = calculate_similarity(given_case.get("description", ""), case.get("Description", ""))
-        overall_similarity = (subject_similarity + description_similarity) / 2
-        similarities.append((case, overall_similarity))
+        prompt += f"\nCase Number: {case['CaseNumber']}\nSubject: {case['Subject']}\nDescription: {case['Description']}\n"
 
-    # Sort by similarity in descending order
-    sorted_cases = sorted(similarities, key=lambda x: x[1], reverse=True)
-    # Return the top N matches with case number and link
+    prompt += "\nPlease provide the top matches with their case numbers and relevance scores."
+
+    response = openai.Completion.create(
+        engine="text-davinci-003",
+        prompt=prompt,
+        max_tokens=150,
+        n=1,
+        stop=None,
+        temperature=0.7,
+    )
+
+    response_text = response.choices[0].text.strip()
     top_matches = []
-    for case, similarity in sorted_cases[:top_n]:
-        case_number = case["CaseNumber"]
-        case_link = f"{DOMAIN}/lightning/r/Case/{case['Id']}/view"
-        top_matches.append({
-            "case_number": case_number,
-            "case_link": case_link,
-            "subject": case["Subject"],
-            "description": case["Description"],
-            "similarity": similarity
-        })
-    return top_matches
+    for line in response_text.split('\n'):
+        if line.startswith("Case Number:"):
+            parts = line.split()
+            case_number = parts[2]
+            relevance_score = float(parts[-1])
+            for case in cases:
+                if case["CaseNumber"] == case_number:
+                    top_matches.append({
+                        "case_number": case["CaseNumber"],
+                        "case_link": f"{DOMAIN}/lightning/r/Case/{case['Id']}/view",
+                        "subject": case["Subject"],
+                        "description": case["Description"],
+                        "similarity": relevance_score
+                    })
+                    break
+    return top_matches[:top_n]
 
 # Function to get access token
 def get_access_token():
@@ -239,8 +250,8 @@ def match_cases():
     # Fetch cases from Salesforce
     existing_cases = fetch_cases(access_token)
 
-    # Find top matches
-    top_matches = find_top_matches(given_case, existing_cases)
+    # Find top matches using GPT-3.5
+    top_matches = find_top_matches_gpt(given_case, existing_cases)
 
     return jsonify(top_matches)
 
