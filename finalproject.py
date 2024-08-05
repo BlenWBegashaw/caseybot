@@ -137,7 +137,7 @@ CORS(app)
 socketio = SocketIO(app)
 
 # Define constants
-DOMAIN = 'https://ciscomeraki4-dev-ed.develop.my.salesforce.com'
+DOMAIN = 'https://ciscomeraki4-dev-ed.develop.lightning.force.com/lightning/r/Case/500aj00000FL9RyAAL/view'
 OAUTH_ENDPOINT = '/services/oauth2/token'
 
 # Define your Salesforce credentials
