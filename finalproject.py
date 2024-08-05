@@ -8,8 +8,8 @@ from difflib import SequenceMatcher
 import openai
 
 app = Flask(__name__)
-CORS(app)
-socketio = SocketIO(app)
+# CORS(app)
+# socketio = SocketIO(app)
 
 # Define constants
 DOMAIN = 'https://ciscomeraki4-dev-ed.develop.my.salesforce.com'
@@ -106,18 +106,18 @@ def match_cases():
 
     return jsonify(top_matches)
 
-@socketio.on('connect')
-def handle_connect():
-    print('Client connected')
+# @socketio.on('connect')
+# def handle_connect():
+#     print('Client connected')
 
-@socketio.on('disconnect')
-def handle_disconnect():
-    print('Client disconnected')
+# @socketio.on('disconnect')
+# def handle_disconnect():
+#     print('Client disconnected')
 
-@socketio.on('message')
-def handle_message(data):
-    print('Received message: ' + data)
-    # Process the message and perform any necessary actions
+# @socketio.on('message')
+# def handle_message(data):
+#     print('Received message: ' + data)
+#     # Process the message and perform any necessary actions
 
 if __name__ == '__main__':
     from os import environ
