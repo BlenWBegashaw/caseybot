@@ -1,9 +1,6 @@
 import { LightningElement, api, wire } from 'lwc';
-import { getRecord } from 'lightning/uiRecordApi';
-import CASE_SUBJECT_FIELD from '@salesforce/schema/Case.Subject';
-import CASE_DESCRIPTION_FIELD from '@salesforce/schema/Case.Description';
-
-const FIELDS = [CASE_SUBJECT_FIELD, CASE_DESCRIPTION_FIELD];
+import { subscribe, MessageContext } from 'lightning/messageService';
+import SAMPLEMC from '@salesforce/messageChannel/SampleMessageChannel__c';
 
 export default class Caseybot extends LightningElement {
     @api recordId;
@@ -11,15 +8,28 @@ export default class Caseybot extends LightningElement {
     caseDescription;
     recommendations = [];
     showModal = false;
+    subscription = null;
 
-    @wire(getRecord, { recordId: '$recordId', fields: FIELDS })
-    case({ error, data }) {
-        if (data) {
-            this.caseSubject = data.fields.Subject.value;
-            this.caseDescription = data.fields.Description.value;
-        } else if (error) {
-            console.error(error);
+    @wire(MessageContext)
+    messageContext;
+
+    connectedCallback() {
+        this.subscribeToMessageChannel();
+    }
+
+    subscribeToMessageChannel() {
+        if (!this.subscription) {
+            this.subscription = subscribe(
+                this.messageContext,
+                SAMPLEMC,
+                (message) => this.handleMessage(message)
+            );
         }
+    }
+
+    handleMessage(message) {
+        this.caseSubject = message.subject;
+        this.caseDescription = message.description;
     }
 
     handleFetchRecommendations() {
