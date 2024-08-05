@@ -82,7 +82,7 @@ jobs:
           sfdx auth:sfdxurl:store -f sfdx-auth-url.txt -a MyOrg
 
       - name: Deploy Salesforce metadata
-        run: sfdx force:source:deploy -p lwc/force-app/main/default
+        run: sfdx force:source:deploy -p force-app/main/default/lwc/caseybot
 
       - name: Set up Heroku
         uses: akhileshns/heroku-deploy@v3.12.12
