@@ -3,10 +3,12 @@ import requests
 import json
 from flask import Flask, request, jsonify, render_template
 from flask_socketio import SocketIO, emit
+from flask_cors import CORS
 from difflib import SequenceMatcher
 import openai
 
 app = Flask(__name__)
+CORS(app)
 socketio = SocketIO(app)
 
 # Define constants
@@ -89,6 +91,9 @@ def home():
 def match_cases():
     data = request.json
     given_case = data['case']
+
+    # Log the received case for debugging
+    print('Received case:', given_case)
 
     # Get access token
     access_token = get_access_token()
