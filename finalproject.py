@@ -215,6 +215,7 @@ def fetch_cases(access_token):
 # Function to scrape subject and description from the case page
 def scrape_case_details(url):
     response = requests.get(url)
+    print("url:", url)
     soup = BeautifulSoup(response.content, 'html.parser')
 
     print("HERE I AM:", soup)
@@ -288,8 +289,9 @@ def recommend_cases():
 
 if __name__ == '__main__':
     url = 'https://ciscomeraki4-dev-ed.develop.lightning.force.com/lightning/r/Case/500aj00000FL9RyAAL/view'
-    
+    print("HERE IS THE URL", url)
     # Scrape the subject and description from the case page
     subject, description = scrape_case_details(url)
+    
     socketio.run(app, debug=True)
 
