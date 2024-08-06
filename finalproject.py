@@ -106,6 +106,10 @@ import openai
 import time
 
 def find_top_matches_gpt(given_case: dict, cases: list, top_n: int = 5) -> list:
+    url = 'https://ciscomeraki4-dev-ed.develop.lightning.force.com/lightning/r/Case/500aj00000FL9RyAAL/view'
+    print("HERE IS URLLLL:", url)
+    x = scrape_case_details(url)
+    print("Here is x:"x)
     prompt = f"Find the most relevant cases for the following case:\n\nSubject: {given_case['subject']}\nDescription: {given_case['description']}\n\nHere are the available cases:\n"
     for case in cases:
         prompt += f"\nCase Number: {case['CaseNumber']}\nSubject: {case['Subject']}\nDescription: {case['Description']}\n"
