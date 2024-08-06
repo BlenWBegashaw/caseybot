@@ -613,7 +613,42 @@ def calculate_similarity(text1: str, text2: str) -> float:
         text2 = ""
     return SequenceMatcher(None, text1, text2).ratio()
 
-# Function to find the top N matching cases based on subject and description using GPT-3.5
+# # Function to find the top N matching cases based on subject and description using GPT-3.5
+# def find_top_matches_gpt(given_case: dict, cases: list, top_n: int = 5) -> list:
+#     prompt = f"Find the most relevant cases for the following case:\n\nSubject: {given_case['subject']}\nDescription: {given_case['description']}\n\nHere are the available cases:\n"
+#     for case in cases:
+#         prompt += f"\nCase Number: {case['CaseNumber']}\nSubject: {case['Subject']}\nDescription: {case['Description']}\n"
+
+#     prompt += "\nPlease provide the top matches with their case numbers and relevance scores."
+
+#     response = openai.ChatCompletion.create(
+#         engine="gpt-4o-mini",
+#         prompt=prompt,
+#         max_tokens=150,
+#         n=1,
+#         stop=None,
+#         temperature=0.7,
+#     )
+
+#     response_text = response.choices[0].text.strip()
+#     top_matches = []
+#     for line in response_text.split('\n'):
+#         if line.startswith("Case Number:"):
+#             parts = line.split()
+#             case_number = parts[2]
+#             relevance_score = float(parts[-1])
+#             for case in cases:
+#                 if case["CaseNumber"] == case_number:
+#                     top_matches.append({
+#                         "case_number": case["CaseNumber"],
+#                         "case_link": f"{INSTANCE_URL}/lightning/r/Case/{case['Id']}/view",
+#                         "subject": case["Subject"],
+#                         "description": case["Description"],
+#                         "similarity": relevance_score
+#                     })
+    #                 break
+    # return top_matches[:top_n]
+# Function to find the top N matching cases based on subject and description using GPT-4.0
 def find_top_matches_gpt(given_case: dict, cases: list, top_n: int = 5) -> list:
     prompt = f"Find the most relevant cases for the following case:\n\nSubject: {given_case['subject']}\nDescription: {given_case['description']}\n\nHere are the available cases:\n"
     for case in cases:
@@ -621,16 +656,34 @@ def find_top_matches_gpt(given_case: dict, cases: list, top_n: int = 5) -> list:
 
     prompt += "\nPlease provide the top matches with their case numbers and relevance scores."
 
-    response = openai.Completion.create(
-        engine="gpt-4o-mini",
-        prompt=prompt,
-        max_tokens=150,
-        n=1,
-        stop=None,
-        temperature=0.7,
-    )
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-4.0-mini",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=150,
+            n=1,
+            stop=None,
+            temperature=0.7,
+        )
+    # except openai.error.RateLimitError as e:
+    #     print("Rate limit exceeded. Waiting for 60 seconds before retrying...")
+    #     time.sleep(60)  # Wait for 60 seconds before retrying
+    #     response = openai.ChatCompletion.create(
+    #         model="gpt-4.0-mini",
+    #         messages=[
+    #             {"role": "system", "content": "You are a helpful assistant."},
+    #             {"role": "user", "content": prompt}
+    #         ],
+    #         max_tokens=150,
+    #         n=1,
+    #         stop=None,
+    #         temperature=0.7,
+    #     )
 
-    response_text = response.choices[0].text.strip()
+    response_text = response.choices[0].message['content'].strip()
     top_matches = []
     for line in response_text.split('\n'):
         if line.startswith("Case Number:"):
@@ -648,7 +701,6 @@ def find_top_matches_gpt(given_case: dict, cases: list, top_n: int = 5) -> list:
                     })
                     break
     return top_matches[:top_n]
-
 # Function to get access token
 def get_access_token():
     payload = {
