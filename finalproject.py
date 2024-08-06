@@ -104,12 +104,70 @@ import time
 
 import openai
 import time
+import requests
+from bs4 import BeautifulSoup
 
+# Salesforce credentials
+DOMAIN = 'https://login.salesforce.com'
+OAUTH_ENDPOINT = '/services/oauth2/token'
+CONSUMER_KEY = '3MVG9XgkMlifdwVB7aHSFpsEfvZn554iyhEGunwebN1ImlP5XMEoK7YjGcNU2Lm9ZJUylKNLhgzkoPbuy8BPh'
+CONSUMER_SECRET = 'FBEA32905771C3B4C69E8BA0DE8FD91C5C812AFA63BE46137675736792FE9EA3'
+USERNAME = 'blenw@gmail.com'
+PASSWORD = 'Blen1234567?'
+
+# Salesforce instance URL
+INSTANCE_URL = 'https://ciscomeraki4-dev-ed.develop.my.salesforce.com'
+
+# Function to get access token
+def get_access_token():
+    payload = {
+        'grant_type': 'password',
+        'client_id': CONSUMER_KEY,
+        'client_secret': CONSUMER_SECRET,
+        'username': USERNAME,
+        'password': PASSWORD
+    }
+    response = requests.post(DOMAIN + OAUTH_ENDPOINT, data=payload)
+    response.raise_for_status()
+    token_response = response.json()
+    return token_response['access_token'], token_response['instance_url']
+
+# Function to get case details using the Salesforce REST API
+def get_case_details(access_token, instance_url, case_id):
+    headers = {
+        'Authorization': f'Bearer {access_token}',
+        'Content-Type': 'application/json'
+    }
+    case_url = f'{instance_url}/services/data/v52.0/sobjects/Case/{case_id}'
+    response = requests.get(case_url, headers=headers)
+
+    # Check if the request was successful
+    if response.status_code == 200:
+        case_data = response.json()
+        subject = case_data.get('Subject', 'No subject found')
+        description = case_data.get('Description', 'No description found')
+        return subject, description
+    else:
+        print(f'Failed to retrieve the case details. Status code: {response.status_code}')
+        return None, None
 def find_top_matches_gpt(given_case: dict, cases: list, top_n: int = 5) -> list:
-    url = 'https://ciscomeraki4-dev-ed.develop.lightning.force.com/lightning/r/Case/500aj00000FL9RyAAL/view'
-    print("HERE IS URLLLL:", url)
-    x = scrape_case_details(url)
-    print("Here is x:", x)
+    # url = 'https://ciscomeraki4-dev-ed.develop.lightning.force.com/lightning/r/Case/500aj00000FL9RyAAL/view'
+    # print("HERE IS URLLLL:", url)
+    # x = scrape_case_details(url)
+    # print("Here is x:", x)
+    try:
+        # Get access token
+        access_token, instance_url = get_access_token()
+        print('Access token obtained successfully.')
+
+        # Get case details
+        case_id = '500aj00000FL9RyAAL'
+        subject, description = get_case_details(access_token, instance_url, case_id)
+        if subject and description:
+            print(f'Subject: {subject}')
+            print(f'Description: {description}')
+    except Exception as e:
+        print(f'An error occurred: {e}')
     prompt = f"Find the most relevant cases for the following case:\n\nSubject: {given_case['subject']}\nDescription: {given_case['description']}\n\nHere are the available cases:\n"
     for case in cases:
         prompt += f"\nCase Number: {case['CaseNumber']}\nSubject: {case['Subject']}\nDescription: {case['Description']}\n"
@@ -292,10 +350,11 @@ def recommend_cases():
     return jsonify(top_matches)
 
 if __name__ == '__main__':
-    url = 'https://ciscomeraki4-dev-ed.develop.lightning.force.com/lightning/r/Case/500aj00000FL9RyAAL/view'
-    print("HERE IS THE URL", url)
-    # Scrape the subject and description from the case page
-    subject, description = scrape_case_details(url)
+    
+    # url = 'https://ciscomeraki4-dev-ed.develop.lightning.force.com/lightning/r/Case/500aj00000FL9RyAAL/view'
+    # # print("HERE IS THE URL", url)
+    # # # Scrape the subject and description from the case page
+    # # subject, description = scrape_case_details(url)
     
     socketio.run(app, debug=True)
 
