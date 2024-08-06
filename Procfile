@@ -1,2 +1,2 @@
-web: gunicorn finalproject.py:app
+web: gunicorn finalproject:app
 
