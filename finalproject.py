@@ -600,7 +600,7 @@ PASSWORD = 'Blen1234567?'
 
 # Set your OpenAI API key
 # # Set your OpenAI API key
-openai.api_key = 'OPENAI_KEY'
+openai.api_key = 'OPENAI_API_KEY'
 # client = OpenAI(
 #     api_key = os.environ.get('OPENAI_API_KEY') 
 # )
