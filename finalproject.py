@@ -1082,40 +1082,6 @@ def find_top_matches_gpt(given_case: dict, cases: list, top_n: int = 5) -> list:
     print("Top Matches:", top_matches)
     return top_matches[:top_n]
 
-# Function to get access token
-def get_access_token():
-    payload = {
-        'grant_type': 'password',
-        'client_id': CONSUMER_KEY,
-        'client_secret': CONSUMER_SECRET,
-        'username': USERNAME,
-        'password': PASSWORD
-    }
-    response = requests.post(LOGIN_DOMAIN + OAUTH_ENDPOINT, data=payload)
-    response.raise_for_status()
-    token_response = response.json()
-    return token_response['access_token']
-
-# Function to fetch cases from Salesforce
-def fetch_cases(access_token):
-    headers = {
-        'Authorization': f'Bearer {access_token}',
-        'Content-Type': 'application/json'
-    }
-    response = requests.get(f'{INSTANCE_URL}/services/data/v52.0/query/?q=SELECT+Id,CaseNumber,Subject,Description+FROM+Case', headers=headers)
-    response.raise_for_status()
-    return response.json()['records']
-
-# Function to scrape subject and description from the case page
-def scrape_case_details(url):
-    response = requests.get(url)
-    soup = BeautifulSoup(response.content, 'html.parser')
-    subject_element = soup.find('lightning-formatted-text', {'title': True})
-    subject = subject_element['title'].strip() if subject_element else 'No subject found'
-    description_element = soup.find('div', {'class': 'description-class'})  # Update the selector as needed
-    description = description_element.text.strip() if description_element else 'No description found'
-    return subject, description
-
 @app.route('/')
 def home():
     # Example URL to scrape
@@ -1144,5 +1110,3 @@ def home():
     print("Top Matches:", top_matches)
 
     return render_template('file.html', matches=top_matches)
-
-
