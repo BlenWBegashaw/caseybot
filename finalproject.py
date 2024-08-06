@@ -22,7 +22,7 @@
 # PASSWORD = 'Blen1234567?'
 
 # # Set your OpenAI API key
-# openai.api_key = 'sk-proj-CgQcdtaJShKeOwJa7j1sT3BlbkFJjpkjw98nvJqm7HsSia8X'
+# openai.api_key = 'sk-l6r8FFBAuZC-3g5aDaLE3wqHYPcn15QKborDVqrMTXT3BlbkFJqIRzJJypRwwa0wPIS1hPYzZ01DK2ikbV818JyDpWcA'
 
 # # Function to calculate similarity between two strings
 # def calculate_similarity(text1: str, text2: str) -> float:
