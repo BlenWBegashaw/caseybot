@@ -1849,26 +1849,27 @@ def recommend_cases():
     subject, description = scrape_case_details(given_case['url'])
     given_case['subject'] = subject
     given_case['description'] = description
+    print("subject","description", description,subject)
 
-    # Debug: Print the given case
-    print("Given Case:", given_case)
+    # # Debug: Print the given case
+    # print("Given Case:", given_case)
 
-    # Get access token
-    access_token = get_access_token()
+    # # Get access token
+    # access_token = get_access_token()
 
-    # Fetch cases from Salesforce
-    existing_cases = fetch_cases(access_token)
+    # # Fetch cases from Salesforce
+    # existing_cases = fetch_cases(access_token)
 
-    # Debug: Print the existing cases
-    print("Existing Cases:", existing_cases)
+    # # Debug: Print the existing cases
+    # print("Existing Cases:", existing_cases)
 
-    # Find top matches using GPT-3.5 or GPT-4
-    top_matches = find_top_matches_gpt(given_case, existing_cases)
+    # # Find top matches using GPT-3.5 or GPT-4
+    # top_matches = find_top_matches_gpt(given_case, existing_cases)
 
-    # Debug: Print the top matches
-    print("Top Matches:", top_matches)
+    # # Debug: Print the top matches
+    # print("Top Matches:", top_matches)
 
-    return jsonify(top_matches)
+    # return jsonify(top_matches)
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)
