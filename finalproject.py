@@ -693,7 +693,7 @@ def home():
     # Find top matches using GPT-3.5
     top_matches = find_top_matches_gpt(given_case, existing_cases)
 
-    return render_template('index.html', matches=top_matches)
+    return render_template('file.html', matches=top_matches)
 
 @app.route('/match_cases', methods=['POST'])
 def match_cases():
