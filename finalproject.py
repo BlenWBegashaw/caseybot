@@ -579,7 +579,7 @@ from flask_socketio import SocketIO, emit
 from flask_cors import CORS
 from difflib import SequenceMatcher
 from dotenv import load_dotenv
-import openai
+from openai import OpenAI
 from bs4 import BeautifulSoup
 
 # Load environment variables from .env file
@@ -599,7 +599,9 @@ USERNAME = 'blenw@gmail.com'
 PASSWORD = 'Blen1234567?'
 
 # Set your OpenAI API key
-openai.api_key = os.getenv('OPENAI_API_KEY')
+client = OpenAI(
+    api_key = os.environ.get('OPENAI_API_KEY') 
+)
 
 # Function to calculate similarity between two strings
 def calculate_similarity(text1: str, text2: str) -> float:
@@ -618,7 +620,7 @@ def find_top_matches_gpt(given_case: dict, cases: list, top_n: int = 5) -> list:
     prompt += "\nPlease provide the top matches with their case numbers and relevance scores."
 
     response = openai.Completion.create(
-        engine="gpt-4o",
+        engine="gpt-4o-mini",
         prompt=prompt,
         max_tokens=150,
         n=1,
