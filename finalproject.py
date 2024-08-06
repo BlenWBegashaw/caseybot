@@ -1687,13 +1687,13 @@ import os
 import requests
 import json
 import time
-from flask import Flask, request, jsonify, render_template
-from flask_socketio import SocketIO, emit
+from flask import Flask, request, jsonify
+from flask_socketio import SocketIO
 from flask_cors import CORS
 from difflib import SequenceMatcher
 import openai
 from bs4 import BeautifulSoup
-from dotenv import load_dotenv  # Import load_dotenv
+from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()
@@ -1835,32 +1835,7 @@ def scrape_case_details(url):
 
 @app.route('/')
 def home():
-    # Example URL to scrape
-    url = 'https://ciscomeraki4-dev-ed.develop.lightning.force.com/lightning/r/Case/500aj00000FL9RyAAL/view'
-    
-    # Scrape the subject and description from the case page
-    subject, description = scrape_case_details(url)
-    given_case = {'subject': subject, 'description': description}
-
-    # Debug: Print the given case to the console
-    print("Given Case:", given_case)
-
-    # Get access token
-    access_token = get_access_token()
-
-    # Fetch cases from Salesforce
-    existing_cases = fetch_cases(access_token)
-
-    # Debug: Print the existing cases to the console
-    print("Existing Cases:", existing_cases)
-
-    # Find top matches using GPT-3.5 or GPT-4
-    top_matches = find_top_matches_gpt(given_case, existing_cases)
-
-    # Debug: Print the top matches to the console
-    print("Top Matches:", top_matches)
-
-    return render_template('file.html', matches=top_matches)
+    return "Flask server is running."
 
 @app.route('/recommend_cases', methods=['POST'])
 def recommend_cases():
@@ -1872,17 +1847,27 @@ def recommend_cases():
     given_case['subject'] = subject
     given_case['description'] = description
 
+    # Debug: Print the given case
+    print("Given Case:", given_case)
+
     # Get access token
     access_token = get_access_token()
 
     # Fetch cases from Salesforce
     existing_cases = fetch_cases(access_token)
 
+    # Debug: Print the existing cases
+    print("Existing Cases:", existing_cases)
+
     # Find top matches using GPT-3.5 or GPT-4
     top_matches = find_top_matches_gpt(given_case, existing_cases)
+
+    # Debug: Print the top matches
+    print("Top Matches:", top_matches)
 
     return jsonify(top_matches)
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)
+
 
