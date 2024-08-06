@@ -214,7 +214,7 @@ def scrape_case_details(url):
     response = requests.get(url)
     soup = BeautifulSoup(response.content, 'html.parser')
 
-    print(soup)
+    print("HERE I AM:", soup)
     
     # Debug: Print the HTML content
     print("HTML Content:", soup.prettify())
