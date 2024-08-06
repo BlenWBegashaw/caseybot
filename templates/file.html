@@ -1,4 +1,4 @@
-<!-- <!-- <!DOCTYPE html>
+<!-- <!-- <!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -82,4 +82,26 @@
         {% endfor %}
     </ul>
 </body>
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top 5 Match Cases</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Top 5 Match Cases</h1>
+    <ul>
+        {% for match in matches %}
+        <li>
+            <a href="{{ match.case_link }}" target="_blank">{{ match.case_number }}: {{ match.subject }}</a>
+            <p>{{ match.description }}</p>
+            <p>Similarity: {{ match.similarity }}</p>
+        </li>
+        {% endfor %}
+    </ul>
+</body>
 </html>
+
