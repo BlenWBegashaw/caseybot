@@ -171,46 +171,32 @@
 //         });
 //     }
 import { LightningElement, track } from 'lwc';
-import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 export default class Caseybot extends LightningElement {
-    @track recommendations = [];
-    @track showModal = false;
+    @track caseUrl = '';
+    @track matches = [];
 
-    handleFetchRecommendations() {
-        fetch('/recommend_cases', {
+    handleUrlChange(event) {
+        this.caseUrl = event.target.value;
+    }
+
+    handleGetRecommendations() {
+        fetch('https://https://caseybot-3785eca7c1f1.herokuapp.com//recommend_cases', {  // Update this URL to your Heroku app's URL
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                case: {
-                    url: 'https://ciscomeraki4-dev-ed.develop.lightning.force.com/lightning/r/Case/500aj00000FL9RyAAL/view'
-                }
-            }),
+            body: JSON.stringify({ case: { url: this.caseUrl } }),
         })
-        .then(response => response.json())
-        .then(data => {
-            this.recommendations = data;
-            this.showModal = true;
-        })
-        .catch(error => {
-            this.dispatchEvent(
-                new ShowToastEvent({
-                    title: 'Error fetching recommendations',
-                    message: error.message,
-                    variant: 'error',
-                }),
-            );
-        });
-    }
-
-    handleCloseModal() {
-        this.showModal = false;
+            .then((response) => response.json())
+            .then((data) => {
+                // Debug: Print the response data
+                console.log("Response Data:", data);
+                this.matches = data;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
     }
 }
 
-    handleCloseModal() {
-        this.showModal = false;
-    }
-}
