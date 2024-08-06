@@ -102,11 +102,13 @@ def calculate_similarity(text1: str, text2: str) -> float:
 import openai
 import time
 
+import openai
+import time
+
 def find_top_matches_gpt(given_case: dict, cases: list, top_n: int = 5) -> list:
-    # prompt = f"Find the most relevant cases for the following case:\n\nSubject: {given_case['subject']}\nDescription: {given_case['description']}\n\nHere are the available cases:\n"
-    prompt = f"Find the most relevant cases for the following case:\n\nSubject: {"MS Switchports keep flapping"}\nDescription: {"My switch is having issues"}\n\nHere are the available cases:\n"
+    prompt = f"Find the most relevant cases for the following case:\n\nSubject: {given_case['subject']}\nDescription: {given_case['description']}\n\nHere are the available cases:\n"
     for case in cases:
-        prompt += f"\nCase Number: {"100100"}\nSubject: {"MS Switchports keep flapping"}\nDescription: {"My switch is having issues"}\n"
+        prompt += f"\nCase Number: {case['CaseNumber']}\nSubject: {case['Subject']}\nDescription: {case['Description']}\n"
 
     prompt += "\nPlease provide the top matches with their case numbers and relevance scores."
 
@@ -182,6 +184,7 @@ cases = [
 INSTANCE_URL = "https://example.salesforce.com"
 top_matches = find_top_matches_gpt(given_case, cases)
 print(top_matches)
+
 
 
 
