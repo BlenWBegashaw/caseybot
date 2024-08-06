@@ -581,6 +581,9 @@ from difflib import SequenceMatcher
 import openai
 from bs4 import BeautifulSoup
 
+# Load environment variables from .env file
+load_dotenv()
+
 app = Flask(__name__)
 CORS(app)
 socketio = SocketIO(app)
@@ -595,7 +598,7 @@ USERNAME = 'blenw@gmail.com'
 PASSWORD = 'Blen1234567?'
 
 # Set your OpenAI API key
-openai.api_key = 'sk-lqeaCDS4EUf8H8vC8lhNdDcaVqU17xPZ_QhjJlB2YzT3BlbkFJgXtJK9gbrQsIVlLyuTcrSRok95mYbX6aSw4192cewA'
+openai.api_key = os.getenv('OPENAI_API_KEY')
 
 # Function to calculate similarity between two strings
 def calculate_similarity(text1: str, text2: str) -> float:
