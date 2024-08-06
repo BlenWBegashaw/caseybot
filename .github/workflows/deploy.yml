@@ -99,57 +99,57 @@
 #           git commit -m "Deploy to Heroku"
 #           git remote add heroku https://git.heroku.com/${{ secrets.HEROKU_APP_NAME }}.git
 #           git push -f heroku main
-# name: Deploy to Heroku and Salesforce
+name: Deploy to Heroku and Salesforce
 
-# on:
-#   push:
-#     branches:
-#       - main
+on:
+  push:
+    branches:
+      - main
 
-# jobs:
-#   deploy:
-#     runs-on: ubuntu-latest
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
 
-#     steps:
-#       - name: Checkout code
-#         uses: actions/checkout@v2
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-#       - name: Set up Python
-#         uses: actions/setup-python@v2
-#         with:
-#           python-version: '3.10'
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.10'
 
-#       - name: Install dependencies
-#         run: |
-#           cd caseybot
-#           python -m pip install --upgrade pip
-#           pip install -r requirements.txt
+      - name: Install dependencies
+        run: |
+          cd caseybot
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-#       - name: Set up Salesforce CLI
-#         uses: actions/setup-sfdx@v1
-#         with:
-#           version: 'latest'
+      - name: Set up Salesforce CLI
+        uses: actions/setup-sfdx@v1
+        with:
+          version: 'latest'
 
-#       - name: Authenticate with Salesforce
-#         run: |
-#           echo ${{ secrets.SALESFORCE_AUTH_URL }} > sfdx-auth-url.txt
-#           sfdx auth:sfdxurl:store -f sfdx-auth-url.txt -a MyOrg
+      - name: Authenticate with Salesforce
+        run: |
+          echo ${{ secrets.SALESFORCE_AUTH_URL }} > sfdx-auth-url.txt
+          sfdx auth:sfdxurl:store -f sfdx-auth-url.txt -a MyOrg
 
-#       - name: Deploy Salesforce metadata
-#         run: sfdx force:source:deploy -p caseybot/force-app/main/default
+      - name: Deploy Salesforce metadata
+        run: sfdx force:source:deploy -p caseybot/force-app/main/default
 
-#       - name: Set up Heroku
-#         uses: akhileshns/heroku-deploy@v3.12.12
-#         with:
-#           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-#           heroku_app_name: ${{ secrets.HEROKU_APP_NAME }}
-#           heroku_email: ${{ secrets.HEROKU_EMAIL }}
+      - name: Set up Heroku
+        uses: akhileshns/heroku-deploy@v3.12.12
+        with:
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: ${{ secrets.HEROKU_APP_NAME }}
+          heroku_email: ${{ secrets.HEROKU_EMAIL }}
 
-#       - name: Deploy to Heroku
-#         run: |
-#           cd caseybot
-#           git init
-#           git add .
-#           git commit -m "Deploy to Heroku"
-#           git remote add heroku https://git.heroku.com/${{ secrets.HEROKU_APP_NAME }}.git
-#           git push -f heroku main
+      - name: Deploy to Heroku
+        run: |
+          cd caseybot
+          git init
+          git add .
+          git commit -m "Deploy to Heroku"
+          git remote add heroku https://git.heroku.com/${{ secrets.HEROKU_APP_NAME }}.git
+          git push -f heroku main
