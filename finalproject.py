@@ -578,6 +578,7 @@ from flask import Flask, request, jsonify, render_template
 from flask_socketio import SocketIO, emit
 from flask_cors import CORS
 from difflib import SequenceMatcher
+from dotenv import load_dotenv
 import openai
 from bs4 import BeautifulSoup
 
