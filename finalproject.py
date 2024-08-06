@@ -1788,7 +1788,8 @@ import openai
 import time
 
 def find_top_matches_gpt(given_case: dict, cases: list, top_n: int = 5) -> list:
-    prompt = f"Find the most relevant cases for the following case:\n\nSubject: {given_case['subject']}\nDescription: {given_case['description']}\n\nHere are the available cases:\n"
+    # prompt = f"Find the most relevant cases for the following case:\n\nSubject: {given_case['subject']}\nDescription: {given_case['description']}\n\nHere are the available cases:\n"
+    prompt = f"Find the most relevant cases for the following case:\n\nSubject: {"MS Switchports keep flapping"}\nDescription: {"My switch is having issues"}\n\nHere are the available cases:\n"
     for case in cases:
         prompt += f"\nCase Number: {case['CaseNumber']}\nSubject: {case['Subject']}\nDescription: {case['Description']}\n"
 
