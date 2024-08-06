@@ -618,7 +618,7 @@ def find_top_matches_gpt(given_case: dict, cases: list, top_n: int = 5) -> list:
     prompt += "\nPlease provide the top matches with their case numbers and relevance scores."
 
     response = openai.Completion.create(
-        engine="gpt-3.5-turbo-16k-0613",
+        engine="gpt-4o",
         prompt=prompt,
         max_tokens=150,
         n=1,
