@@ -1791,7 +1791,7 @@ def find_top_matches_gpt(given_case: dict, cases: list, top_n: int = 5) -> list:
     # prompt = f"Find the most relevant cases for the following case:\n\nSubject: {given_case['subject']}\nDescription: {given_case['description']}\n\nHere are the available cases:\n"
     prompt = f"Find the most relevant cases for the following case:\n\nSubject: {"MS Switchports keep flapping"}\nDescription: {"My switch is having issues"}\n\nHere are the available cases:\n"
     for case in cases:
-        prompt += f"\nCase Number: {case['CaseNumber']}\nSubject: {case['Subject']}\nDescription: {case['Description']}\n"
+        prompt += f"\nCase Number: {"100100"}\nSubject: {"MS Switchports keep flapping"}\nDescription: {"My switch is having issues"}\n"
 
     prompt += "\nPlease provide the top matches with their case numbers and relevance scores."
 
@@ -1952,8 +1952,8 @@ def recommend_cases():
 
     # Scrape the subject and description from the case page
     subject, description = scrape_case_details(given_case['url'])
-    given_case['subject'] = subject
-    given_case['description'] = description
+    given_case['subject'] = "MS Switchports keep flapping" #subject
+    given_case['description'] = "My switch is having issues" #description
 
     # Get access token
     access_token = get_access_token()
