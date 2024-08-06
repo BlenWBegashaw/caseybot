@@ -1,4 +1,4 @@
-<!-- <!-- <!-- <!-- <!DOCTYPE html>
+<!-- <!-- <!-- <!-- <!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -127,6 +127,30 @@
         {% endfor %}
     </ul>
 </body>
-</html>
+</html> -->
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top Case Matches</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Top Case Matches</h1>
+        <div class="list-group">
+            {% for match in matches %}
+                <a href="{{ match.case_link }}" class="list-group-item list-group-item-action" target="_blank">
+                    <h5 class="mb-1">Case Number: {{ match.case_number }}</h5>
+                    <p class="mb-1"><strong>Subject:</strong> {{ match.subject }}</p>
+                    <p class="mb-1"><strong>Description:</strong> {{ match.description }}</p>
+                    <small><strong>Relevance Score:</strong> {{ match.similarity }}</small>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
 
