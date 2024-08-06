@@ -1730,6 +1730,9 @@ def find_top_matches_gpt(given_case: dict, cases: list, top_n: int = 5) -> list:
 
     prompt += "\nPlease provide the top matches with their case numbers and relevance scores."
 
+    # Debug: Print the prompt
+    print("Prompt:", prompt)
+
     try:
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",  # or use "gpt-4" if you have access
@@ -1812,10 +1815,22 @@ def fetch_cases(access_token):
 def scrape_case_details(url):
     response = requests.get(url)
     soup = BeautifulSoup(response.content, 'html.parser')
+    
+    # Debug: Print the HTML content
+    print("HTML Content:", soup.prettify())
+    
+    # Update the selectors based on the actual HTML structure
     subject_element = soup.find('lightning-formatted-text', {'title': True})
     subject = subject_element['title'].strip() if subject_element else 'No subject found'
-    description_element = soup.find('div', {'class': 'description-class'})  # Update the selector as needed
+    
+    # Update the selector for the description element
+    description_element = soup.find('div', {'class': 'slds-form-element__control'})  # Update the selector as needed
     description = description_element.text.strip() if description_element else 'No description found'
+    
+    # Debug: Print the extracted subject and description
+    print("Extracted Subject:", subject)
+    print("Extracted Description:", description)
+    
     return subject, description
 
 @app.route('/')
@@ -1870,3 +1885,4 @@ def recommend_cases():
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)
+
