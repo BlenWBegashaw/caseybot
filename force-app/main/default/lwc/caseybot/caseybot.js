@@ -170,6 +170,9 @@
 //             console.error('Error fetching recommendations:', error);
 //         });
 //     }
+
+
+
 import { LightningElement, track } from 'lwc';
 
 export default class Caseybot extends LightningElement {
@@ -181,14 +184,18 @@ export default class Caseybot extends LightningElement {
     }
 
     handleGetRecommendations() {
-        fetch('https://https://caseybot-3785eca7c1f1.herokuapp.com//recommend_cases', {  // Update this URL to your Heroku app's URL
+        console.log("Sending request to Flask backend with URL:", this.caseUrl);
+        fetch('https://caseybot-3785eca7c1f1.herokuapp.com/recommend_cases', {  // Update this URL to your Heroku app's URL
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ case: { url: this.caseUrl } }),
         })
-            .then((response) => response.json())
+            .then((response) => {
+                console.log("Received response from Flask backend:", response);
+                return response.json();
+            })
             .then((data) => {
                 // Debug: Print the response data
                 console.log("Response Data:", data);
@@ -199,4 +206,3 @@ export default class Caseybot extends LightningElement {
             });
     }
 }
-
