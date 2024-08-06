@@ -284,5 +284,9 @@ def recommend_cases():
     return jsonify(top_matches)
 
 if __name__ == '__main__':
+    url = 'https://ciscomeraki4-dev-ed.develop.lightning.force.com/lightning/r/Case/500aj00000FL9RyAAL/view'
+    
+    # Scrape the subject and description from the case page
+    subject, description = scrape_case_details(url)
     socketio.run(app, debug=True)
 
