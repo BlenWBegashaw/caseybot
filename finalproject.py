@@ -579,7 +579,7 @@ from flask_socketio import SocketIO, emit
 from flask_cors import CORS
 from difflib import SequenceMatcher
 from dotenv import load_dotenv
-from openai import OpenAI
+import OpenAI
 from bs4 import BeautifulSoup
 
 # Load environment variables from .env file
