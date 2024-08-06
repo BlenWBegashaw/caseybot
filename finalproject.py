@@ -983,6 +983,7 @@
 # if __name__ == '__main__':
 #     from os import environ
 #     socketio.run(app, host='0.0.0.0', port=int(environ.get('PORT', 5000)), debug=True)
+
 import os
 import requests
 import json
@@ -993,7 +994,7 @@ from flask_cors import CORS
 from difflib import SequenceMatcher
 import openai
 from bs4 import BeautifulSoup
-from dotenv import load_dotenv  # Import load_dotenv
+from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()
@@ -1006,10 +1007,10 @@ socketio = SocketIO(app)
 LOGIN_DOMAIN = 'https://login.salesforce.com'
 INSTANCE_URL = 'https://ciscomeraki4-dev-ed.develop.my.salesforce.com'
 OAUTH_ENDPOINT = '/services/oauth2/token'
-CONSUMER_KEY = '3MVG9XgkMlifdwVB7aHSFpsEfvZn554iyhEGunwebN1ImlP5XMEoK7YjGcNU2Lm9ZJUylKNLhgzkoPbuy8BPh'
-CONSUMER_SECRET = 'FBEA32905771C3B4C69E8BA0DE8FD91C5C812AFA63BE46137675736792FE9EA3'
-USERNAME = 'blenw@gmail.com'
-PASSWORD = 'Blen1234567?'
+CONSUMER_KEY = os.getenv('CONSUMER_KEY')
+CONSUMER_SECRET = os.getenv('CONSUMER_SECRET')
+USERNAME = os.getenv('USERNAME')
+PASSWORD = os.getenv('PASSWORD')
 
 # Set your OpenAI API key
 openai.api_key = os.getenv('OPENAI_API_KEY')
@@ -1032,27 +1033,27 @@ def find_top_matches_gpt(given_case: dict, cases: list, top_n: int = 5) -> list:
 
     try:
         response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",  # or use "gpt-4" if you have access
+            model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=150,
+            max_tokens=300,
             n=1,
             stop=None,
             temperature=0.7,
         )
         response_text = response.choices[0].message['content'].strip()
-    except openai.error.RateLimitError as e:
+    except openai.error.RateLimitError:
         print("Rate limit exceeded. Waiting for 60 seconds before retrying...")
         time.sleep(60)  # Wait for 60 seconds before retrying
         response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",  # or use "gpt-4" if you have access
+            model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=150,
+            max_tokens=300,
             n=1,
             stop=None,
             temperature=0.7,
@@ -1062,12 +1063,18 @@ def find_top_matches_gpt(given_case: dict, cases: list, top_n: int = 5) -> list:
     # Debug: Print the response text to the console
     print("Response Text:", response_text)
 
+    # Parsing the response to extract case numbers and relevance scores
     top_matches = []
-    for line in response_text.split('\n'):
-        if line.startswith("Case Number:"):
-            parts = line.split()
+    lines = response_text.split('\n')
+    for i in range(len(lines)):
+        if lines[i].startswith("Case Number:"):
+            parts = lines[i].split()
             case_number = parts[2]
-            relevance_score = float(parts[-1])
+            try:
+                relevance_score = float(parts[-1])
+            except ValueError:
+                relevance_score = None
+
             for case in cases:
                 if case["CaseNumber"] == case_number:
                     top_matches.append({
@@ -1078,6 +1085,7 @@ def find_top_matches_gpt(given_case: dict, cases: list, top_n: int = 5) -> list:
                         "similarity": relevance_score
                     })
                     break
+
     # Debug: Print the top matches to the console
     print("Top Matches:", top_matches)
     return top_matches[:top_n]
@@ -1145,3 +1153,5 @@ def home():
 
     return render_template('file.html', matches=top_matches)
 
+if __name__ == '__main__':
+    socketio.run(app, debug=True)
