@@ -1723,6 +1723,70 @@ def calculate_similarity(text1: str, text2: str) -> float:
     return SequenceMatcher(None, text1, text2).ratio()
 
 # Function to find the top N matching cases based on subject and description using GPT-3.5 or GPT-4
+# def find_top_matches_gpt(given_case: dict, cases: list, top_n: int = 5) -> list:
+#     prompt = f"Find the most relevant cases for the following case:\n\nSubject: {given_case['subject']}\nDescription: {given_case['description']}\n\nHere are the available cases:\n"
+#     for case in cases:
+#         prompt += f"\nCase Number: {case['CaseNumber']}\nSubject: {case['Subject']}\nDescription: {case['Description']}\n"
+
+#     prompt += "\nPlease provide the top matches with their case numbers and relevance scores."
+
+#     try:
+#         response = openai.ChatCompletion.create(
+#             model="gpt-3.5-turbo",  # or use "gpt-4" if you have access
+#             messages=[
+#                 {"role": "system", "content": "You are a helpful assistant."},
+#                 {"role": "user", "content": prompt}
+#             ],
+#             max_tokens=150,
+#             n=1,
+#             stop=None,
+#             temperature=0.7,
+#         )
+#         response_text = response.choices[0].message['content'].strip()
+#     except openai.error.RateLimitError as e:
+#         print("Rate limit exceeded. Waiting for 60 seconds before retrying...")
+#         time.sleep(60)  # Wait for 60 seconds before retrying
+#         response = openai.ChatCompletion.create(
+#             model="gpt-3.5-turbo",  # or use "gpt-4" if you have access
+#             messages=[
+#                 {"role": "system", "content": "You are a helpful assistant."},
+#                 {"role": "user", "content": prompt}
+#             ],
+#             max_tokens=150,
+#             n=1,
+#             stop=None,
+#             temperature=0.7,
+#         )
+#         response_text = response.choices[0].message['content'].strip()
+
+#     # Debug: Print the response text to the console
+#     print("Response Text:", response_text)
+
+#     top_matches = []
+#     for line in response_text.split('\n'):
+#         if "Case Number:" in line:
+#             parts = line.split()
+#             case_number = parts[2]
+#             relevance_score = 0.0  # Default relevance score
+#             if "Relevance Score:" in line:
+#                 relevance_score = float(parts[-1].replace("(", "").replace(")", "").replace("Relevance", "").replace("Score:", "").replace("High", "1.0").replace("Medium", "0.5").replace("Low", "0.1"))
+#             for case in cases:
+#                 if case["CaseNumber"] == case_number:
+#                     top_matches.append({
+#                         "case_number": case["CaseNumber"],
+#                         "case_link": f"{INSTANCE_URL}/lightning/r/Case/{case['Id']}/view",
+#                         "subject": case["Subject"],
+#                         "description": case["Description"],
+#                         "similarity": relevance_score
+#                     })
+#                     break
+#     # Debug: Print the top matches to the console
+#     print("Top Matches:", top_matches)
+#     return top_matches[:top_n]
+
+import openai
+import time
+
 def find_top_matches_gpt(given_case: dict, cases: list, top_n: int = 5) -> list:
     prompt = f"Find the most relevant cases for the following case:\n\nSubject: {given_case['subject']}\nDescription: {given_case['description']}\n\nHere are the available cases:\n"
     for case in cases:
@@ -1758,31 +1822,62 @@ def find_top_matches_gpt(given_case: dict, cases: list, top_n: int = 5) -> list:
             temperature=0.7,
         )
         response_text = response.choices[0].message['content'].strip()
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return []
 
     # Debug: Print the response text to the console
     print("Response Text:", response_text)
 
     top_matches = []
     for line in response_text.split('\n'):
-        if "Case Number:" in line:
-            parts = line.split()
-            case_number = parts[2]
-            relevance_score = 0.0  # Default relevance score
-            if "Relevance Score:" in line:
-                relevance_score = float(parts[-1].replace("(", "").replace(")", "").replace("Relevance", "").replace("Score:", "").replace("High", "1.0").replace("Medium", "0.5").replace("Low", "0.1"))
-            for case in cases:
-                if case["CaseNumber"] == case_number:
-                    top_matches.append({
-                        "case_number": case["CaseNumber"],
-                        "case_link": f"{INSTANCE_URL}/lightning/r/Case/{case['Id']}/view",
-                        "subject": case["Subject"],
-                        "description": case["Description"],
-                        "similarity": relevance_score
-                    })
-                    break
+        if line.startswith("Case Number:"):
+            try:
+                parts = line.split()
+                case_number = parts[2]
+                relevance_score = float(parts[-1])
+                for case in cases:
+                    if case["CaseNumber"] == case_number:
+                        top_matches.append({
+                            "case_number": case["CaseNumber"],
+                            "case_link": f"{INSTANCE_URL}/lightning/r/Case/{case['Id']}/view",
+                            "subject": case["Subject"],
+                            "description": case["Description"],
+                            "similarity": relevance_score
+                        })
+                        break
+            except Exception as e:
+                print(f"Error parsing line '{line}': {e}")
+
     # Debug: Print the top matches to the console
     print("Top Matches:", top_matches)
     return top_matches[:top_n]
+
+# Example usage:
+given_case = {"subject": "Network Issue", "description": "The network is down in the office."}
+cases = [
+    {"CaseNumber": "001", "Subject": "Network Issue", "Description": "The network is down in the office.", "Id": "a1"},
+    {"CaseNumber": "002", "Subject": "Login Issue", "Description": "Unable to login to the system.", "Id": "b2"},
+    {"CaseNumber": "003", "Subject": "Network Issue", "Description": "Slow internet speed.", "Id": "c3"},
+    {"CaseNumber": "004", "Subject": "Hardware Issue", "Description": "The printer is not working.", "Id": "d4"},
+    {"CaseNumber": "005", "Subject": "Network Issue", "Description": "Wi-Fi is not connecting.", "Id": "e5"},
+]
+
+INSTANCE_URL = "https://example.salesforce.com"
+top_matches = find_top_matches_gpt(given_case, cases)
+print(top_matches)
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Function to get access token
 def get_access_token():
