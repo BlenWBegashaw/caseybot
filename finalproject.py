@@ -68,7 +68,18 @@ def scrape_case_details(url):
         response = session.get(url)
         response.raise_for_status()  # Ensure the request was successful
 
-        soup = BeautifulSoup(response.content, 'html.parser')
+        # Check if the response is a redirection page
+        if "window.location.replace" in response.text or "window.location.href" in response.text:
+            # Extract the redirection URL
+            soup = BeautifulSoup(response.content, 'html.parser')
+            redirect_script = soup.find('script', text=lambda t: t and "window.location" in t)
+            if redirect_script:
+                redirect_url = redirect_script.text.split("'")[1]
+                response = session.get(redirect_url)
+                response.raise_for_status()
+                soup = BeautifulSoup(response.content, 'html.parser')
+        else:
+            soup = BeautifulSoup(response.content, 'html.parser')
 
         # Debug: Print the HTML content
         print("HTML Content:", soup.prettify())
