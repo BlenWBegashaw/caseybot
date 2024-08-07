@@ -63,29 +63,36 @@ def fetch_cases(access_token):
 
 # Function to scrape subject and description from the case page
 def scrape_case_details(url):
-    response = requests.get(url)
-    soup = BeautifulSoup(response.content, 'html.parser')
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # Ensure the request was successful
+        soup = BeautifulSoup(response.content, 'html.parser')
 
-    # Debug: Print the HTML content
-    print("HTML Content:", soup.prettify())
-    
-    # Update the selectors based on the actual HTML structure
-    subject_element = soup.find('lightning-formatted-text', {'title': True})
-    subject = subject_element['title'].strip() if subject_element else 'No subject found'
-    
-    # Update the selector for the description element
-    description_element = soup.find('lightning-formatted-text', {'data-output-element-id': 'output-field'})
-    description = description_element.text.strip() if description_element else 'No description found'
-    
-    # Ensure subject and description are strings
-    subject = str(subject)
-    description = str(description)
-    
-    # Debug: Print the extracted subject and description
-    print("Extracted Subject:", subject)
-    print("Extracted Description:", description)
-    
-    return subject, description
+        # Debug: Print the HTML content
+        print("HTML Content:", soup.prettify())
+
+        # Update the selectors based on the actual HTML structure
+        subject_element = soup.find('lightning-formatted-text', {'title': True})
+        subject = subject_element['title'].strip() if subject_element else 'No subject found'
+
+        description_element = soup.find('lightning-formatted-text', {'data-output-element-id': 'output-field'})
+        description = description_element.text.strip() if description_element else 'No description found'
+
+        # Ensure subject and description are strings
+        subject = str(subject)
+        description = str(description)
+
+        # Debug: Print the extracted subject and description
+        print("Extracted Subject:", subject)
+        print("Extracted Description:", description)
+
+        return subject, description
+    except requests.RequestException as e:
+        print(f"Request error: {e}")
+        return 'No subject found', 'No description found'
+    except Exception as e:
+        print(f"An error occurred while scraping: {e}")
+        return 'No subject found', 'No description found'
 
 # Function to find the top N matching cases based on subject and description using GPT-3.5 or GPT-4
 def find_top_matches_gpt(given_case: dict, cases: list, top_n: int = 5) -> list:
