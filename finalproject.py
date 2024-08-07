@@ -77,6 +77,10 @@ def scrape_case_details(url):
     description_element = soup.find('lightning-formatted-text', {'data-output-element-id': 'output-field'})
     description = description_element.text.strip() if description_element else 'No description found'
     
+    # Ensure subject and description are strings
+    subject = str(subject)
+    description = str(description)
+    
     # Debug: Print the extracted subject and description
     print("Extracted Subject:", subject)
     print("Extracted Description:", description)
@@ -202,6 +206,7 @@ def recommend_cases():
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)
+
 # import os
 # import requests
 # import json
