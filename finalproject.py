@@ -60,12 +60,22 @@ def fetch_cases(access_token):
     response = requests.get(f'{INSTANCE_URL}/services/data/v52.0/query/?q=SELECT+Id,CaseNumber,Subject,Description+FROM+Case', headers=headers)
     response.raise_for_status()
     return response.json()['records']
-
-# Function to scrape subject and description from the case page
 def scrape_case_details(url):
     try:
-        response = requests.get(url)
+        session = requests.Session()
+        response = session.get(url)
         response.raise_for_status()  # Ensure the request was successful
+
+        # Check if the response is a redirection page
+        if "window.location.replace" in response.text or "window.location.href" in response.text:
+            # Extract the redirection URL
+            soup = BeautifulSoup(response.content, 'html.parser')
+            redirect_script = soup.find('script', text=lambda t: t and "window.location" in t)
+            if redirect_script:
+                redirect_url = redirect_script.text.split("'")[1]
+                response = session.get(redirect_url)
+                response.raise_for_status()
+
         soup = BeautifulSoup(response.content, 'html.parser')
 
         # Debug: Print the HTML content
