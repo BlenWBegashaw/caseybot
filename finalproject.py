@@ -60,23 +60,23 @@ def fetch_cases(access_token):
     response = requests.get(f'{INSTANCE_URL}/services/data/v52.0/query/?q=SELECT+Id,CaseNumber,Subject,Description+FROM+Case', headers=headers)
     response.raise_for_status()
     return response.json()['records']
+
+
 def scrape_case_details(url):
     try:
         session = requests.Session()
         response = session.get(url)
         response.raise_for_status()  # Ensure the request was successful
 
-        # Check if the response is a redirection page
-        if "window.location.replace" in response.text or "window.location.href" in response.text:
-            # Extract the redirection URL
-            soup = BeautifulSoup(response.content, 'html.parser')
-            redirect_script = soup.find('script', text=lambda t: t and "window.location" in t)
-            if redirect_script:
-                redirect_url = redirect_script.text.split("'")[1]
-                response = session.get(redirect_url)
-                response.raise_for_status()
-
         soup = BeautifulSoup(response.content, 'html.parser')
+
+        # Check if the content is within an iframe
+        iframe = soup.find('iframe')
+        if iframe:
+            iframe_url = iframe['src']
+            response = session.get(iframe_url)
+            response.raise_for_status()
+            soup = BeautifulSoup(response.content, 'html.parser')
 
         # Debug: Print the HTML content
         print("HTML Content:", soup.prettify())
@@ -103,6 +103,7 @@ def scrape_case_details(url):
     except Exception as e:
         print(f"An error occurred while scraping: {e}")
         return 'No subject found', 'No description found'
+
 
 # Function to find the top N matching cases based on subject and description using GPT-3.5 or GPT-4
 def find_top_matches_gpt(given_case: dict, cases: list, top_n: int = 5) -> list:
