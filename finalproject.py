@@ -70,14 +70,6 @@ def scrape_case_details(url):
 
         soup = BeautifulSoup(response.content, 'html.parser')
 
-        # Check if the content is within an iframe
-        iframe = soup.find('iframe')
-        if iframe:
-            iframe_url = iframe['src']
-            response = session.get(iframe_url)
-            response.raise_for_status()
-            soup = BeautifulSoup(response.content, 'html.parser')
-
         # Debug: Print the HTML content
         print("HTML Content:", soup.prettify())
 
@@ -85,7 +77,7 @@ def scrape_case_details(url):
         subject_element = soup.find('lightning-formatted-text', {'title': True})
         subject = subject_element['title'].strip() if subject_element else 'No subject found'
 
-        description_element = soup.find('lightning-formatted-text', {'data-output-element-id': 'output-field'})
+        description_element = soup.find('lightning-formatted-text', {'data-output-element-id': 'output-field', 'slot': 'outputField'})
         description = description_element.text.strip() if description_element else 'No description found'
 
         # Ensure subject and description are strings
@@ -103,6 +95,7 @@ def scrape_case_details(url):
     except Exception as e:
         print(f"An error occurred while scraping: {e}")
         return 'No subject found', 'No description found'
+
 
 
 # Function to find the top N matching cases based on subject and description using GPT-3.5 or GPT-4
