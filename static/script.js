@@ -139,3 +139,49 @@ document.addEventListener('DOMContentLoaded', (event) => {
 //         recommendationsContainer.innerHTML = '<p>No recommendations found.</p>';
 //     }
 // }
+document.addEventListener('DOMContentLoaded', function() {
+    // Function to fetch recommendations
+    async function fetchRecommendations(caseUrl) {
+        try {
+            const response = await fetch('/recommend_cases', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ case: { url: caseUrl } })
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const data = await response.json();
+            displayRecommendations(data);
+        } catch (error) {
+            console.error('Error fetching recommendations:', error);
+        }
+    }
+
+    // Function to display recommendations
+    function displayRecommendations(recommendations) {
+        const recommendationsContainer = document.getElementById('recommendations');
+        recommendationsContainer.innerHTML = '';
+
+        recommendations.forEach(rec => {
+            const recElement = document.createElement('div');
+            recElement.className = 'recommendation';
+            recElement.innerHTML = `
+                <h3>Case Number: ${rec.case_number}</h3>
+                <p>Subject: ${rec.subject}</p>
+                <p>Description: ${rec.description}</p>
+                <p>Similarity: ${rec.similarity}</p>
+                <a href="${rec.case_link}" target="_blank">View Case</a>
+            `;
+            recommendationsContainer.appendChild(recElement);
+        });
+    }
+
+    // Example usage: Fetch recommendations for a specific case URL
+    const caseUrl = 'https://ciscomeraki4-dev-ed.develop.lightning.force.com/lightning/r/Case/500aj00000FL9RyAAL/view';
+    fetchRecommendations(caseUrl);
+});
